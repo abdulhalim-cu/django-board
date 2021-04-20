@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 from .models import Board, Topic, Post
 from .forms import NewTopicForm, PostForm
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 class BoardListView(ListView):
     model = Board
@@ -16,7 +18,16 @@ class BoardListView(ListView):
 
 def board_topics(request, pk):
     board = get_object_or_404(Board, pk=pk)
-    topics = board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
+    queryset = board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(queryset, 20)
+    try:
+        topics = paginator.page(page)
+    except PageNotAnInteger:
+        topics = paginator.page(1)
+    except EmptyPage:
+        topics = paginator.page(paginator.num_pages)
     return render(request, 'topics.html', {'board': board, 'topics': topics})
 
 

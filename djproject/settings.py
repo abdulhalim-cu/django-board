@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'boards.apps.BoardsConfig',
     'accounts.apps.AccountsConfig',
+    'django.contrib.humanize',
     'widget_tweaks',
 ]
 
